@@ -38,23 +38,23 @@ namespace ros2_canopen
         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publish_actual_speed;
         rclcpp::CallbackGroup::SharedPtr timer_group;
         uint32_t period_ms_;
-        bool intialised;
+        bool initialised;
         void register_services();
 
     public:
         explicit MotionControllerDriver(const rclcpp::NodeOptions &options)
             : ProxyDriver(options)
         {
-            intialised = false;
+            initialised = false;
         }
 
         void run()
         {
-            if(!intialised)
+            if(!initialised)
             {
-                RCLCPP_INFO(this->get_logger(), "Intitialising Device and Objects");
+                RCLCPP_INFO(this->get_logger(), "Initialising Device and Objects");
                 timer_->cancel();
-                intialised = true;
+                initialised = true;
                 motor_->registerDefaultModes();
                 mc_driver_->validate_objs();
                 timer_= this->create_wall_timer(
