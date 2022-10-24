@@ -120,6 +120,16 @@ void MotionControllerDriver::handle_set_target(
     }
 }
 
+void MotionControllerDriver::handle_is_ready(
+    const std_srvs::srv::Trigger::Request::SharedPtr request,
+    std_srvs::srv::Trigger::Response::SharedPtr response)
+{
+    if (active.load())
+    {
+        response->success = initialised;
+    }
+}
+
 void MotionControllerDriver::publish(){
     std_msgs::msg::Float64 pos_msg;
     std_msgs::msg::Float64 speed_msg;
@@ -169,6 +179,10 @@ void MotionControllerDriver::register_services()
     handle_set_target_service = this->create_service<canopen_interfaces::srv::COTargetDouble>(
         std::string(this->get_name()).append("/target").c_str(),
         std::bind(&MotionControllerDriver::handle_set_target, this, _1, _2));
+
+    handle_is_ready_service = this->create_service<std_srvs::srv::Trigger>(
+        std::string(this->get_name()).append("/is_ready").c_str(),
+        std::bind(&MotionControllerDriver::handle_is_ready, this, _1, _2));
 }
 
 void MotionControllerDriver::init(ev::Executor &exec,

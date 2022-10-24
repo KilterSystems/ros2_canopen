@@ -33,6 +33,7 @@ namespace ros2_canopen
         rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr handle_set_mode_velocity_service;
         rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr handle_set_mode_cyclic_velocity_service;
         rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr handle_set_mode_cyclic_position_service;
+        rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr handle_is_ready_service;
         rclcpp::Service<canopen_interfaces::srv::COTargetDouble>::SharedPtr handle_set_target_service;
         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publish_actual_position;
         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publish_actual_speed;
@@ -205,6 +206,16 @@ namespace ros2_canopen
         void handle_set_target(
             const canopen_interfaces::srv::COTargetDouble::Request::SharedPtr request,
             canopen_interfaces::srv::COTargetDouble::Response::SharedPtr response);
+
+        /**
+         * @brief Service Callback to check if CAN bus is ready for commands
+         *
+         * @param [in] request
+         * @param [out] response
+         */
+        void handle_is_ready(
+            const std_srvs::srv::Trigger::Request::SharedPtr request,
+            std_srvs::srv::Trigger::Response::SharedPtr response);
 
         /**
          * @brief Publishes actual position and speed
