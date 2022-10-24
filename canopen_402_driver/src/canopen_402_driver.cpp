@@ -32,6 +32,7 @@ void MotionControllerDriver::handle_halt(
     if (active.load())
     {
         motor_->handleHalt();
+        response->success = true;
     }
 }
 
@@ -46,8 +47,7 @@ void MotionControllerDriver::handle_set_mode_position(
             response->success = motor_->enterModeAndWait(MotorBase::Profiled_Position);
             return;
         }
-
-        response->success = false;
+        response->success = true;
     }
 }
 
@@ -62,7 +62,7 @@ void MotionControllerDriver::handle_set_mode_velocity(
             response->success = motor_->enterModeAndWait(MotorBase::Profiled_Velocity);
             return;
         }
-        response->success = false;
+        response->success = true;
     }
 }
 
@@ -77,7 +77,7 @@ void MotionControllerDriver::handle_set_mode_cyclic_position(
             response->success = motor_->enterModeAndWait(MotorBase::Cyclic_Synchronous_Position);
             return;
         }
-        response->success = false;
+        response->success = true;
     }
 }
 
@@ -92,7 +92,7 @@ void MotionControllerDriver::handle_set_mode_cyclic_velocity(
             response->success = motor_->enterModeAndWait(MotorBase::Cyclic_Synchronous_Velocity);
             return;
         }
-        response->success = false;
+        response->success = true;
     }
 }
 
