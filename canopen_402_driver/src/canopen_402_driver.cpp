@@ -133,17 +133,28 @@ void MotionControllerDriver::handle_is_ready(
 void MotionControllerDriver::publish(){
     std_msgs::msg::Float64 pos_msg;
     std_msgs::msg::Float64 speed_msg;
+    std_msgs::msg::Float64 filtered_rms_msg;
+    std_msgs::msg::UInt16 drive_temperature_msg;
+    std_msgs::msg::UInt32 digital_inputs_msg;
     pos_msg.data = mc_driver_->get_position();
     speed_msg.data = mc_driver_->get_speed();
+    filtered_rms_msg.data = mc_driver_->get_filtered_rms_current();
+    drive_temperature_msg.data = mc_driver_->get_drive_temperature();
+    digital_inputs_msg.data = mc_driver_->get_digital_inputs();
     publish_actual_position->publish(pos_msg);
     publish_actual_speed->publish(speed_msg);
+    publish_filtered_rms->publish(filtered_rms_msg);
+    publish_drive_temperature->publish(drive_temperature_msg);
+    publish_digital_inputs->publish(digital_inputs_msg);
 }
-
 
 void MotionControllerDriver::register_services()
 {
     publish_actual_position = this->create_publisher<std_msgs::msg::Float64>("~/actual_position", 10);;
     publish_actual_speed = this->create_publisher<std_msgs::msg::Float64>("~/actual_speed", 10);
+    publish_filtered_rms = this->create_publisher<std_msgs::msg::Float64>("~/filtered_rms_current", 10);
+    publish_drive_temperature = this->create_publisher<std_msgs::msg::UInt16>("~/drive_temperature", 10);
+    publish_digital_inputs = this->create_publisher<std_msgs::msg::UInt32>("~/digital_inputs", 10);
     handle_init_service = this->create_service<std_srvs::srv::Trigger>(
         std::string(this->get_name()).append("/init").c_str(),
         std::bind(&MotionControllerDriver::handle_init, this, _1, _2));

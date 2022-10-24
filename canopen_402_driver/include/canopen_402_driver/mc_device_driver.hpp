@@ -36,6 +36,9 @@ namespace ros2_canopen
         bool sync;
         double speed;
         double position;
+        double filtered_rms_current;
+        int16_t drive_temperature;
+        uint32_t digital_inputs;
 
     public:
         /**
@@ -107,6 +110,21 @@ namespace ros2_canopen
             if(idx == 0x6064 && subidx == 0x0)
             {
                 position = rpdo_mapped[idx][subidx].Read<int32_t>();
+            }
+
+            if(idx == 0x201B && subidx == 0x0)
+            {
+                filtered_rms_current = rpdo_mapped[idx][subidx].Read<float_t>();
+            }
+
+            if(idx == 0x22A2 && subidx == 0x0)
+            {
+                drive_temperature = rpdo_mapped[idx][subidx].Read<uint16_t>();
+            }
+
+            if(idx == 0x60FD && subidx == 0x0)
+            {
+                digital_inputs = rpdo_mapped[idx][subidx].Read<uint32_t>();
             }
         }
 
@@ -300,6 +318,36 @@ namespace ros2_canopen
         double get_position()
         {
             return position;
+        }
+
+        /**
+         * @brief Get the filtered rms current object
+         *
+         * @return double
+         */
+        double get_filtered_rms_current()
+        {
+            return filtered_rms_current;
+        }
+
+        /**
+         * @brief Get the drive temperature object
+         *
+         * @return int16
+         */
+        int16_t get_drive_temperature()
+        {
+            return drive_temperature;
+        }
+
+        /**
+         * @brief Get the digital inputs object
+         *
+         * @return uint32
+         */
+        uint32_t get_digital_inputs()
+        {
+            return digital_inputs;
         }
 
         MCDeviceDriver(ev_exec_t *exec, canopen::AsyncMaster &master, uint8_t id)

@@ -4,6 +4,8 @@
 #include "canopen_402_driver/visibility_control.h"
 #include "std_srvs/srv/trigger.hpp"
 #include "std_msgs/msg/float64.hpp"
+#include "std_msgs/msg/u_int16.hpp"
+#include "std_msgs/msg/u_int32.hpp"
 #include "canopen_interfaces/srv/co_target_double.hpp"
 #include "canopen_proxy_driver/canopen_proxy_driver.hpp"
 #include "canopen_402_driver/motor.hpp"
@@ -37,6 +39,9 @@ namespace ros2_canopen
         rclcpp::Service<canopen_interfaces::srv::COTargetDouble>::SharedPtr handle_set_target_service;
         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publish_actual_position;
         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publish_actual_speed;
+        rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publish_filtered_rms;
+        rclcpp::Publisher<std_msgs::msg::UInt16>::SharedPtr publish_drive_temperature;
+        rclcpp::Publisher<std_msgs::msg::UInt32>::SharedPtr publish_digital_inputs;
         rclcpp::CallbackGroup::SharedPtr timer_group;
         uint32_t period_ms_;
         bool initialised;
