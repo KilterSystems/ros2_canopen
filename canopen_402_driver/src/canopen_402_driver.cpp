@@ -130,6 +130,14 @@ void MotionControllerDriver::handle_is_ready(
     }
 }
 
+void MotionControllerDriver::target_speed_cb(const std_msgs::msg::Float64::SharedPtr msg)
+{
+    if (active.load())
+    {
+        motor_->setTarget(msg->data);
+    }
+}
+
 void MotionControllerDriver::publish(){
     std_msgs::msg::Float64 pos_msg;
     std_msgs::msg::Float64 speed_msg;
@@ -155,6 +163,9 @@ void MotionControllerDriver::register_services()
     publish_filtered_rms = this->create_publisher<std_msgs::msg::Float64>("~/filtered_rms_current", 10);
     publish_drive_temperature = this->create_publisher<std_msgs::msg::UInt16>("~/drive_temperature", 10);
     publish_digital_inputs = this->create_publisher<std_msgs::msg::UInt32>("~/digital_inputs", 10);
+
+    target_speed_sub = create_subscription<std_msgs::msg::Float64>(
+        "~/target_speed", 10, std::bind(&MotionControllerDriver::target_speed_cb, this, _1));
     handle_init_service = this->create_service<std_srvs::srv::Trigger>(
         std::string(this->get_name()).append("/init").c_str(),
         std::bind(&MotionControllerDriver::handle_init, this, _1, _2));
