@@ -380,7 +380,7 @@ namespace canopen_402
             MotorBase(),
             switching_state_(State402::Operation_Enable),
             monitor_mode_(true),
-            state_switch_timeout_(5)
+            state_switch_timeout_(10)
         {
             this->driver = driver;
             status_word_entry_ = driver->create_remote_obj(status_word_entry_index, 0U, CODataTypes::COData16);

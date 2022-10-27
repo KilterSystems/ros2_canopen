@@ -229,7 +229,9 @@ void MotionControllerDriver::init(ev::Executor &exec,
     timer_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     timer_ = this->create_wall_timer(
         2000ms, std::bind(&MotionControllerDriver::run, this), timer_group);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    std::this_thread::sleep_for(100ms);
+    mc_driver_->nmt_command(canopen::NmtCommand::START);
 
     if (!driver->Boot()) {
         RCLCPP_ERROR(this->get_logger(), "NMT boot failed...");

@@ -487,7 +487,7 @@ namespace canopen_402
             }
         }
 
-        RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "sw: %x, mode %hhi, state: %d", sw, new_mode, (int)state_handler_.getState());
+        RCLCPP_DEBUG(rclcpp::get_logger("canopen_402_driver"), "sw: %x, mode %hhi, state: %d", sw, new_mode, (int)state_handler_.getState());
 
         return true;
     }
