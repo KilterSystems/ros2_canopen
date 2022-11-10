@@ -9,9 +9,8 @@ void LifecycleMotionControllerDriver::handle_init(
 {
     if (activated_.load())
     {
-        motor_->handleInit();
+        response->success = motor_->handleInit();
         mc_driver_->validate_objs();
-        response->success = true;
     }
 }
 

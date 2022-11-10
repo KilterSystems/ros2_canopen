@@ -62,9 +62,11 @@ namespace ros2_canopen
                     ((*it)->type == type)
                 )
                 {
+                    std::cout << "remote object already exist: " << index << ":" << subindex;
                     return *it;
                 }
             }
+            std::cout << "remote object created: " << std::hex << index << ":" << subindex << "  " << std::endl;
             std::shared_ptr<RemoteObject> objp = std::make_shared<RemoteObject>(obj);
             objs.push_back(objp);
             return objp;

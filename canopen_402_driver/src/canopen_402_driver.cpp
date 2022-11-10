@@ -9,9 +9,8 @@ void MotionControllerDriver::handle_init(
 {
     if (active.load())
     {
-        motor_->handleInit();
+        response->success = motor_->handleInit();
         mc_driver_->validate_objs();
-        response->success = true;
     }
 }
 
@@ -194,7 +193,12 @@ void MotionControllerDriver::init(ev::Executor &exec,
     timer_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     timer_ = this->create_wall_timer(
         2000ms, std::bind(&MotionControllerDriver::run, this), timer_group);
-    driver->Boot();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    if (!driver->Boot()) {
+        RCLCPP_ERROR(this->get_logger(), "NMT boot failed...");
+    }
+
     active.store(true);
 }
 

@@ -175,6 +175,7 @@ namespace canopen_402
         catch (...)
         {
             /// @todo Print error here.
+            RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "Error here.");
         }
         return false;
     }
@@ -410,7 +411,7 @@ namespace canopen_402
             }
             else
             {
-                RCLCPP_INFO(rclcpp::get_logger("canopen_402_driver"), "Mode switch timed out.");
+                RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "Mode switch timed out.");
                 driver->set_remote_obj<int8_t>(op_mode_, mode_id_);
             }
         }
@@ -433,13 +434,13 @@ namespace canopen_402
             bool success = Command402::setTransition(control_word_, state, target_state_, &next);
             if (!success)
             {
-                RCLCPP_INFO(rclcpp::get_logger("canopen_402_driver"), "Could not set transition.");
+                RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "Could not set transition.");
                 return false;
             }
             lock.unlock();
             if (state != next && !state_handler_.waitForNewState(abstime, state))
             {
-                RCLCPP_INFO(rclcpp::get_logger("canopen_402_driver"), "Transition timed out.");
+                RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "Transition timed out.");
                 return false;
             }
         }
@@ -448,7 +449,6 @@ namespace canopen_402
 
     bool Motor402::readState()
     {
-
         uint16_t old_sw, sw = driver->get_remote_obj<uint16_t>(status_word_entry_); // TODO: added error handling
         old_sw = status_word_.exchange(sw);
 
@@ -457,14 +457,12 @@ namespace canopen_402
         std::unique_lock lock(mode_mutex_);
         uint16_t new_mode;
         new_mode = driver->get_remote_obj<int8_t>(op_mode_display_);
-        //RCLCPP_INFO(rclcpp::get_logger("canopen_402_driver"), "Mode %hhi",new_mode);
 
         if (selected_mode_ && selected_mode_->mode_id_ == new_mode)
         {
             if (!selected_mode_->read(sw))
             {
-
-                RCLCPP_INFO(rclcpp::get_logger("canopen_402_driver"), "Mode handler has error.");
+                RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "Mode handler has error.");
             }
         }
         if (new_mode != mode_id_)
@@ -472,21 +470,24 @@ namespace canopen_402
             mode_id_ = new_mode;
             mode_cond_.notify_all();
         }
+
         if (selected_mode_ && selected_mode_->mode_id_ != new_mode)
         {
-            RCLCPP_INFO(rclcpp::get_logger("canopen_402_driver"), "Mode does not match.");
+            RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "Mode does not match.");
         }
         if (sw & (1 << State402::SW_Internal_limit))
         {
             if (old_sw & (1 << State402::SW_Internal_limit))
             {
-                RCLCPP_INFO(rclcpp::get_logger("canopen_402_driver"), "Internal limit active");
+                RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "Internal limit active");
             }
             else
             {
-                RCLCPP_INFO(rclcpp::get_logger("canopen_402_driver"), "Internal limit active");
+                RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "Internal limit active");
             }
         }
+
+        RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "sw: %x, mode %hhi, state: %d", sw, new_mode, (int)state_handler_.getState());
 
         return true;
     }
@@ -496,7 +497,6 @@ namespace canopen_402
     }
     void Motor402::handleWrite()
     {
-
         std::scoped_lock lock(cw_mutex_);
         control_word_ |= (1 << Command402::CW_Halt);
         if (state_handler_.getState() == State402::Operation_Enable)
@@ -564,7 +564,7 @@ namespace canopen_402
             std::cout << "Internal limit active" << std::endl;
         }
     }
-    void Motor402::handleInit()
+    bool Motor402::handleInit()
     {
         for (std::unordered_map<uint16_t, AllocFuncType>::iterator it = mode_allocators_.begin(); it != mode_allocators_.end(); ++it)
         {
@@ -574,7 +574,7 @@ namespace canopen_402
         if (!readState())
         {
             std::cout <<"Could not read motor state" << std::endl;
-            return;
+            return false;
         }
         {
             std::scoped_lock lock(cw_mutex_);
@@ -585,13 +585,15 @@ namespace canopen_402
         if (!switchState(State402::Operation_Enable))
         {
             std::cout <<"Could not enable motor" << std::endl;
-            return;
+            return false;
         }
-       
+
+        return true; // Don't do homing LARS LARS
+
         ModeSharedPtr m = allocMode(MotorBase::Homing);
         if (!m)
         {
-            return; // homing not supported
+            return true; // homing not supported
         }
 
         HomingMode *homing = dynamic_cast<HomingMode *>(m.get());
@@ -599,26 +601,27 @@ namespace canopen_402
         if (!homing)
         {
             std::cout <<"Homing mode has incorrect handler" << std::endl;
-            return;
+            return false;
         }
         RCLCPP_INFO(rclcpp::get_logger("canopen_402_driver"), "Init: Switch to homing");
         if (!switchMode(MotorBase::Homing))
         {
             std::cout <<"Could not enter homing mode" << std::endl;
-            return;
+            return false;
         }
         RCLCPP_INFO(rclcpp::get_logger("canopen_402_driver"), "Init: Execute homing");
         if (!homing->executeHoming())
         {
             std::cout <<"Homing failed" << std::endl;
-            return;
+            return false;
         }
         RCLCPP_INFO(rclcpp::get_logger("canopen_402_driver"), "Init: Switch no mode");
         if (!switchMode(MotorBase::No_Mode))
         {
             std::cout <<"Could not enter no mode" << std::endl;
-            return;
+            return false;
         }
+        return true;
     }
     void Motor402::handleShutdown()
     {

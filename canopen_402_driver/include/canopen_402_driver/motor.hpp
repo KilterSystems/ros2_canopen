@@ -404,7 +404,7 @@ namespace canopen_402
          * and then executes the chosen homing method.
          * 
          */
-        void handleInit();
+        bool handleInit();
         void handleRead();
         void handleWrite();
         /**
