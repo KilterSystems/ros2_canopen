@@ -300,6 +300,11 @@ namespace canopen_402
         return selected_mode_ ? selected_mode_->mode_id_ : (uint16_t)MotorBase::No_Mode;
     }
 
+    uint16_t Motor402::getState()
+    {
+        return (uint16_t)state_handler_.getState();
+    }
+
     bool Motor402::isModeSupportedByDevice(uint16_t mode)
     {
         if (!supported_drive_modes_->valid)

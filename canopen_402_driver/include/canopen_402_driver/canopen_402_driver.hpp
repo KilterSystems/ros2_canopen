@@ -42,6 +42,7 @@ namespace ros2_canopen
         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publish_filtered_rms;
         rclcpp::Publisher<std_msgs::msg::UInt16>::SharedPtr publish_drive_temperature;
         rclcpp::Publisher<std_msgs::msg::UInt32>::SharedPtr publish_digital_inputs;
+        rclcpp::Publisher<std_msgs::msg::UInt32>::SharedPtr publish_motor_state;
         rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr target_speed_sub;
         rclcpp::CallbackGroup::SharedPtr timer_group;
         uint32_t period_ms_;

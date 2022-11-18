@@ -394,6 +394,7 @@ namespace canopen_402
         virtual bool enterModeAndWait(uint16_t mode);
         virtual bool isModeSupported(uint16_t mode);
         virtual uint16_t getMode();
+        virtual uint16_t getState();
         bool readState();
         void handleDiag();
         /**
