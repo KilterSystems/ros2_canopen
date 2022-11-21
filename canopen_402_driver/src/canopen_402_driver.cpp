@@ -132,6 +132,7 @@ void MotionControllerDriver::handle_is_ready(
 
 void MotionControllerDriver::target_speed_cb(const std_msgs::msg::Float64::SharedPtr msg)
 {
+    last_speed_time_ = now();
     if (active.load())
     {
         motor_->setTarget(msg->data);
@@ -170,6 +171,7 @@ void MotionControllerDriver::register_services()
 
     target_speed_sub = create_subscription<std_msgs::msg::Float64>(
         "~/target_speed", 10, std::bind(&MotionControllerDriver::target_speed_cb, this, _1));
+
     handle_init_service = this->create_service<std_srvs::srv::Trigger>(
         std::string(this->get_name()).append("/init").c_str(),
         std::bind(&MotionControllerDriver::handle_init, this, _1, _2));

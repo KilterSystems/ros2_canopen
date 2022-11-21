@@ -45,6 +45,7 @@ namespace ros2_canopen
         rclcpp::Publisher<std_msgs::msg::UInt32>::SharedPtr publish_motor_state;
         rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr target_speed_sub;
         rclcpp::CallbackGroup::SharedPtr timer_group;
+        rclcpp::Time last_speed_time_;
         uint32_t period_ms_;
         bool initialised;
         void register_services();
@@ -54,6 +55,7 @@ namespace ros2_canopen
             : ProxyDriver(options)
         {
             initialised = false;
+            last_speed_time_ = now();
         }
 
         void run()
@@ -71,6 +73,11 @@ namespace ros2_canopen
 
             motor_->handleRead();
             motor_->handleWrite();
+
+            if (now() - last_speed_time_ > 1s) {
+                motor_->setTarget(0.0);
+            }
+
             //motor_->handleDiag();
             publish();
         }
