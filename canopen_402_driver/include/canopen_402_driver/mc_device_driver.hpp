@@ -36,7 +36,7 @@ namespace ros2_canopen
         bool sync;
         double speed;
         double position;
-        double filtered_rms_current;
+        double rms_current;
         int16_t drive_temperature;
         uint32_t digital_inputs;
 
@@ -112,9 +112,9 @@ namespace ros2_canopen
                 position = rpdo_mapped[idx][subidx].Read<int32_t>();
             }
 
-            if(idx == 0x201B && subidx == 0x0)
+            if(idx == 0x6078 && subidx == 0x0)
             {
-                filtered_rms_current = rpdo_mapped[idx][subidx].Read<float_t>();
+                rms_current = ((double)rpdo_mapped[idx][subidx].Read<int16_t>()) / 1000.0;
             }
 
             if(idx == 0x22A2 && subidx == 0x0)
@@ -321,13 +321,13 @@ namespace ros2_canopen
         }
 
         /**
-         * @brief Get the filtered rms current object
+         * @brief Get the rms current object
          *
          * @return double
          */
-        double get_filtered_rms_current()
+        double get_rms_current()
         {
-            return filtered_rms_current;
+            return rms_current;
         }
 
         /**

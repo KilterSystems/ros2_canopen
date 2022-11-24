@@ -39,7 +39,7 @@ namespace ros2_canopen
         rclcpp::Service<canopen_interfaces::srv::COTargetDouble>::SharedPtr handle_set_target_service;
         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publish_actual_position;
         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publish_actual_speed;
-        rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publish_filtered_rms;
+        rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publish_rms_current;
         rclcpp::Publisher<std_msgs::msg::UInt16>::SharedPtr publish_drive_temperature;
         rclcpp::Publisher<std_msgs::msg::UInt32>::SharedPtr publish_digital_inputs;
         rclcpp::Publisher<std_msgs::msg::UInt32>::SharedPtr publish_motor_state;
