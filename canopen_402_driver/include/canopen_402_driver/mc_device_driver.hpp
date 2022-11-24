@@ -25,9 +25,9 @@ namespace ros2_canopen
 
     /**
      * @brief Specialised LelyBridge for MotionControllers
-     * 
+     *
      * This class provides funtionalities necessary for interacting
-     * with the canopen_402 stack from ros_canopen. 
+     * with the canopen_402 stack from ros_canopen.
      */
     class MCDeviceDriver : public LelyBridge
     {
@@ -43,14 +43,14 @@ namespace ros2_canopen
     public:
         /**
          * @brief Create a remote obj object
-         * 
+         *
          * This function registers an object on the remote that is frequently used
          * to control the device. A pointer to the object is stored.
-         * 
+         *
          * @param [in] index            Index of remote object
          * @param [in] subindex         Subindex of remote object
          * @param [in] type             Type of remote object
-         * @return std::shared_ptr<RemoteObject> 
+         * @return std::shared_ptr<RemoteObject>
          */
         std::shared_ptr<RemoteObject> create_remote_obj(uint16_t index, uint8_t subindex, CODataTypes type)
         {
@@ -77,11 +77,11 @@ namespace ros2_canopen
 
         /**
          * @brief Update registered objectsa on RPDO write
-         * 
+         *
          * This function is called when an RPDO write request is received
          * from the remote device. The funciton updates the registered objects
          * in its remote dictionary.
-         * 
+         *
          * @param [in] idx              Index of written object
          * @param [in] subidx           Subindex of written object
          */
@@ -130,10 +130,10 @@ namespace ros2_canopen
 
         /**
          * @brief Set the remote obj
-         * 
+         *
          * Set the data of the remote object. This function will write the
          * data passed to it to the local cache and the remote dictionary.
-         * 
+         *
          * @tparam T                Datatype of the object
          * @param [in] obj          Shared pointer to the object
          * @param [in] data         Data to be written
@@ -153,17 +153,17 @@ namespace ros2_canopen
             }
             else
             {
-                this->tpdo_mapped[obj->index][obj->subindex] = data; 
+                this->tpdo_mapped[obj->index][obj->subindex] = data;
                 this->tpdo_mapped[obj->index][obj->subindex].WriteEvent();
             }
         }
         /**
          * @brief Get the remote obj
-         * 
+         *
          * Gets the data stored in the remote object. If the object is
          * PDO mapped, the cached data is returned, else the data is fetched
          * via SDO request.
-         * 
+         *
          * @tparam T                Datatype of the object
          * @param [in] obj          Pointer to object
          * @return T                Data that was read
@@ -207,9 +207,9 @@ namespace ros2_canopen
 
         /**
          * @brief Validate objects in dictionary
-         * 
+         *
          * Validates whether objects exist and whether they are pdo mapped.
-         * 
+         *
          */
         void validate_objs()
         {
@@ -232,9 +232,9 @@ namespace ros2_canopen
                         break;
                     default:
                         throw lely::canopen::SdoError(
-                            this->get_id(), 
-                            obj->index, 
-                            obj->subindex, 
+                            this->get_id(),
+                            obj->index,
+                            obj->subindex,
                             std::make_error_code(std::errc::function_not_supported),
                             "Unkown used, type must be 8, 16 or 32.");
                         break;
@@ -261,9 +261,9 @@ namespace ros2_canopen
                         break;
                     default:
                         throw lely::canopen::SdoError(
-                            this->get_id(), 
-                            obj->index, 
-                            obj->subindex, 
+                            this->get_id(),
+                            obj->index,
+                            obj->subindex,
                             std::make_error_code(std::errc::function_not_supported),
                             "Unkown used, type must be 8, 16 or 32.");
                         break;
@@ -289,10 +289,10 @@ namespace ros2_canopen
                 default:
                 break;
                 }
-                std::cout << "Initialised object :" 
-                    << this->get_id() << " " 
-                    << std::hex << obj->index << " " 
-                    << std::dec << obj->subindex << " " 
+                std::cout << "Initialised object :"
+                    << this->get_id() << " "
+                    << std::hex << obj->index << " "
+                    << std::dec << obj->subindex << " "
                     << obj->data << " "
                     << "RPDO: " << (obj->rpdo_mapped ? "yes" : "no") << " "
                     << "TPDO: " << (obj->tpdo_mapped ? "yes" : "no") << " "
@@ -302,8 +302,8 @@ namespace ros2_canopen
 
         /**
          * @brief Get the speed object
-         * 
-         * @return double 
+         *
+         * @return double
          */
         double get_speed()
         {
@@ -312,8 +312,8 @@ namespace ros2_canopen
 
         /**
          * @brief Get the position object
-         * 
-         * @return double 
+         *
+         * @return double
          */
         double get_position()
         {
