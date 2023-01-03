@@ -24,6 +24,7 @@
 #include "canopen_base_driver/lely_bridge.hpp"
 #include "canopen_core/device.hpp"
 #include "canopen_interfaces/msg/co_data.hpp"
+#include "canopen_interfaces/msg/co_emcy.hpp"
 #include "canopen_interfaces/srv/co_read.hpp"
 #include "canopen_interfaces/srv/co_write.hpp"
 
@@ -40,9 +41,12 @@ namespace ros2_canopen
   private:
     std::future<void> nmt_state_publisher_future;
     std::future<void> rpdo_publisher_future;
+    std::future<void> emcy_publisher_future;
+    std::atomic<bool> activated_;
 
     void nmt_listener();
     void rdpo_listener();
+    void emcy_listener();
 
   protected:
     std::shared_ptr<ros2_canopen::LelyBridge> driver;
@@ -80,18 +84,35 @@ namespace ros2_canopen
           data.data_);
     }
 
+    /**
+     * @brief Emergency Callback
+     *
+     * This function is called when the associated
+     * LelyBridge receives an emergency message.
+     *
+     * @param [in] msg Emergency Message
+     */
+    virtual void on_emcy(COEmcy msg)
+    {
+      RCLCPP_WARN(
+          this->get_logger(),
+          "We've got an emergency message! %u %u",
+          msg.eec_,
+          msg.er_);
+    }
+
     explicit BaseDriver(
         const rclcpp::NodeOptions &options)
-        : DriverInterface("base_driver", options) {}
+        : DriverInterface("base_driver", options), activated_(false) {}
 
   public:
     /**
      * @brief Initializer for the driver
-     * 
+     *
      * Initializes the driver, adds it to the CANopen Master.
      * This function needs to be executed inside the masters
      * event loop or the masters thread!
-     * 
+     *
      * @param [in] exec       The executor to be used for the driver
      * @param [in] master     The master the driver should be added to
      * @param [in] node_id    The nodeid of the device the driver commands
@@ -103,12 +124,12 @@ namespace ros2_canopen
         std::shared_ptr<ConfigurationManager> config) noexcept override;
     /**
      * @brief Removes the driver from master
-     * 
+     *
      * @todo Check interface!
-     * 
-     * @param [in] exec     
-     * @param [in] master 
-     * @param [in] node_id 
+     *
+     * @param [in] exec
+     * @param [in] master
+     * @param [in] node_id
      */
     void remove(
       ev::Executor &exec,

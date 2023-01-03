@@ -1,6 +1,6 @@
 //    Copyright 2022 Harshavadan Deshpande
 //                   Christoph Hellmann Santos
-// 
+//
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
 //    You may obtain a copy of the License at
@@ -31,6 +31,14 @@ public:
   uint8_t subindex_;
   uint32_t data_;
   CODataTypes type_;
+};
+
+struct COEmcy
+{
+public:
+  uint16_t eec_;
+  uint8_t er_;
+  uint8_t msef_[5];
 };
 }
 

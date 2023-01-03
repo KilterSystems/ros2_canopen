@@ -29,9 +29,39 @@ void BaseDriver::nmt_listener()
 void BaseDriver::rdpo_listener()
 {
   while (rclcpp::ok()) {
-    auto f = driver->async_request_rpdo();
-    f.wait();
-    on_rpdo(f.get());
+    if (driver && activated_.load()) {
+      auto f = driver->async_request_rpdo();
+      while (f.wait_for(100ms) != std::future_status::ready) {
+      }
+      try
+      {
+        on_rpdo(f.get());
+      }
+      catch(const std::future_error& e)
+      {
+        RCLCPP_WARN(this->get_logger(), "rdpo_listener Caught an error");
+      }
+    }
+  }
+
+}
+
+void BaseDriver::emcy_listener()
+{
+  while (rclcpp::ok()) {
+    if (driver && activated_.load()) {
+      auto f = driver->async_request_emcy();
+      while (f.wait_for(100ms) != std::future_status::ready) {
+      }
+      try
+      {
+        //on_emcy(f.get());
+      }
+      catch(const std::future_error& e)
+      {
+        RCLCPP_WARN(this->get_logger(), "emcy_listener Caught an error");
+      }
+    }
   }
 }
 
@@ -54,7 +84,13 @@ void BaseDriver::init(
     std::launch::async,
     std::bind(&ros2_canopen::BaseDriver::rdpo_listener, this)
     );
+  emcy_publisher_future =
+    std::async(
+    std::launch::async,
+    std::bind(&ros2_canopen::BaseDriver::emcy_listener, this)
+    );
   driver->Boot();
+  activated_.store(true);
 }
 
 void BaseDriver::remove(

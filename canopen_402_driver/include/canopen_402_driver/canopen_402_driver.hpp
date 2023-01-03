@@ -90,7 +90,7 @@ namespace ros2_canopen
     protected:
         virtual void on_rpdo(COData data) override
         {
-            RCLCPP_INFO(this->get_logger(), "on_rpo not implemented");
+            RCLCPP_WARN(this->get_logger(), "on_rpo not implemented");
         }
 
     private:

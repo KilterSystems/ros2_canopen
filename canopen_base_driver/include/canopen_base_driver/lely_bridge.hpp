@@ -42,7 +42,7 @@ namespace ros2_canopen
  * This class provides functionalities for bridging between
  * Lelycore drivers and standard C++ functions. This means
  * it provides async and sync functions for interacting with
- * CANopen devices using synchronisation functionalities from C++ standard 
+ * CANopen devices using synchronisation functionalities from C++ standard
  * library.
  *
  */
@@ -103,15 +103,20 @@ private:
   std::atomic<bool> rpdo_is_set;
   std::mutex pdo_mtex;
 
+  // EMCY synchronisation items
+  std::promise<COEmcy> emcy_promise;
+  std::atomic<bool> emcy_is_set;
+  std::mutex emcy_mtex;
+
   std::vector<std::shared_ptr<TPDOWriteTask>> tpdo_tasks;
   uint8_t nodeid;
 
   /**
    * @brief OnState Callback
-   * 
+   *
    * This callback function is called when an Nmt state
    * change is detected on the connected device.
-   * 
+   *
    * @param [in] state    NMT State
    */
   void
@@ -119,22 +124,35 @@ private:
 
   /**
    * @brief OnRpdoWrite Callback
-   * 
+   *
    * This callback function is called when an RPDO
-   * write request is received from the connected device. 
-   * 
-   * @param [in] idx      Object Index 
+   * write request is received from the connected device.
+   *
+   * @param [in] idx      Object Index
    * @param [in] subidx   Object Subindex
    */
   void
   OnRpdoWrite(uint16_t idx, uint8_t subidx) noexcept override;
+
+  /**
+   * @brief OnEmcy Callback
+   *
+   * This callback function is called when an emergency
+   * message is received from the connected device.
+   *
+   * @param [in] eec      Object Error Code
+   * @param [in] er       Object Error Register
+   * @param [in] msef     Object Vendor Specific error info
+   */
+  void
+  OnEmcy(uint16_t eec, uint8_t er, uint8_t msef[5]) noexcept override;
 
 public:
   using FiberDriver::FiberDriver;
 
   /**
    * @brief Construct a new Lely Bridge object
-   * 
+   *
    * @param [in] exec     Executor to use
    * @param [in] master   Master to use
    * @param [in] id       NodeId to connect to
@@ -148,12 +166,12 @@ public:
 
   /**
    * @brief Asynchronous SDO Write
-   * 
+   *
    * Writes the data passed to the function via SDO to
    * the connected device.
    *
    * @param [in] data     Data to written.
-   * 
+   *
    * @return std::future<bool>
    * Returns an std::future<bool> that is fulfilled
    * when the write request was done. An error is
@@ -163,9 +181,9 @@ public:
 
   /**
    * @brief Aynchronous SDO Read
-   * 
+   *
    * Reads the indicated SDO object from the connected
-   * device. 
+   * device.
    *
    * @param [in] data       Data to be read, the data entry is not used.
    * @return std::future<COData>
@@ -178,7 +196,7 @@ public:
 
   /**
    * @brief Asynchronous request for NMT
-   * 
+   *
    * Waits for an NMT state change to occur. The new
    * state is stored in the future returned by the function.
    *
@@ -200,6 +218,18 @@ public:
   std::future<COData> async_request_rpdo();
 
   /**
+   * @brief Asynchronous request for emergency message
+   *
+   * Waits for an emergency message to be received from
+   * the slave. The content of the message is stored in
+   * the returned future.
+   *
+   * @return std::future<COEmcy>
+   * The returned future is set when an emergency event is detected.
+   */
+  std::future<COEmcy> async_request_emcy();
+
+  /**
    * @brief Executes a TPDO transmission
    *
    * This funciton executes a TPDO transmission. The
@@ -216,7 +246,7 @@ public:
    * This function sends the NMT command specified as
    * parameter.
    *
-   * @param [in] command    NMT Command to execute 
+   * @param [in] command    NMT Command to execute
    */
   void nmt_command(canopen::NmtCommand command);
 

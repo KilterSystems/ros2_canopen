@@ -9,7 +9,7 @@ import launch.actions
 import launch.events
 
 import launch_ros
-import launch_ros.events  
+import launch_ros.events
 import launch_ros.events.lifecycle
 from launch.substitutions import LaunchConfiguration, PythonExpression, TextSubstitution
 from launch.actions import DeclareLaunchArgument
@@ -19,26 +19,26 @@ import lifecycle_msgs.msg
 def generate_launch_description():
 
     bus_conf_arg = DeclareLaunchArgument(
-      'bus_config', 
-      default_value=TextSubstitution(text=''), 
+      'bus_config',
+      default_value=TextSubstitution(text=''),
       description="Path to the bus configuration to use."
     )
 
     master_conf_arg = DeclareLaunchArgument(
-      'master_config', 
-      default_value=TextSubstitution(text=''), 
+      'master_config',
+      default_value=TextSubstitution(text=''),
       description="Path to the master configuration to use (dcf)."
     )
 
     master_bin_arg = DeclareLaunchArgument(
-      'master_bin', 
-      default_value=TextSubstitution(text='2'), 
+      'master_bin',
+      default_value=TextSubstitution(text='2'),
       description="Path to the master configuration to use (bin)."
     )
 
     can_interface_arg = DeclareLaunchArgument(
-      'can_interface_name', 
-      default_value=TextSubstitution(text="vcan0"), 
+      'can_interface_name',
+      default_value=TextSubstitution(text="vcan0"),
       description="CAN interface used by master and drivers."
     )
 
@@ -53,11 +53,11 @@ def generate_launch_description():
     )
     lifecycle_device_container_node = launch_ros.actions.LifecycleNode(
         name="device_container_node",
-        namespace="", 
-        package="canopen_core", 
-        output="screen", 
+        namespace="",
+        package="canopen_core",
+        output="screen",
         executable="device_container_node",
-        parameters=[ 
+        parameters=[
             {
                 "bus_config": LaunchConfiguration("bus_config")
             },
@@ -71,6 +71,7 @@ def generate_launch_description():
                 "can_interface_name": LaunchConfiguration("can_interface_name")
             },
         ],
+        #prefix=['xterm -e gdb -ex run --args'],
     )
 
     ld.add_action(bus_conf_arg)

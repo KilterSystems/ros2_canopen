@@ -7,10 +7,10 @@ ExternalProject_Add(upstr_lely_core_libraries    # Name for custom target
   #--Download step--------------
   GIT_REPOSITORY https://gitlab.com/lely_industries/lely-core.git
   GIT_TAG f13629b4fcc042744ff497c8bf7428cf2775aba8
-  TIMEOUT 60          
+  TIMEOUT 60
   #--Update/Patch step----------
-  UPDATE_COMMAND touch <SOURCE_DIR>/config.h 
-    COMMAND mkdir -p <SOURCE_DIR>/include <SOURCE_DIR>/lib 
+  UPDATE_COMMAND touch <SOURCE_DIR>/config.h
+    COMMAND mkdir -p <SOURCE_DIR>/include <SOURCE_DIR>/lib
     COMMAND touch <SOURCE_DIR>/python/dcf-tools/README.md
   #--Configure step-------------
   CONFIGURE_COMMAND autoreconf -i <SOURCE_DIR> COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --disable-cython --disable-doc --disable-tests --disable-static
@@ -25,7 +25,7 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib DESTINATION ${CMAKE_INSTALL_PR
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/ DESTINATION bin
         PATTERN "bin/*"
-        PERMISSIONS WORLD_EXECUTE WORLD_READ OWNER_WRITE GROUP_WRITE)
+        PERMISSIONS WORLD_EXECUTE WORLD_READ OWNER_WRITE OWNER_EXECUTE OWNER_READ GROUP_WRITE GROUP_EXECUTE GROUP_READ)
 
 set(lely_core_cmake_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include("cmake/lely_core_libraries-extras.cmake" NO_POLICY_SCOPE)

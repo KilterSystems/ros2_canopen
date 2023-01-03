@@ -22,6 +22,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/COTargetDouble.srv"
   "srv/CONode.srv"
   "msg/COData.msg"
+  "msg/COEmcy.msg"
 )
 
 

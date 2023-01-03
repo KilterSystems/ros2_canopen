@@ -63,7 +63,7 @@ void ProxyDriver::on_tpdo(const canopen_interfaces::msg::COData::SharedPtr msg)
 
 void ProxyDriver::on_rpdo(COData d)
 {
-  RCLCPP_INFO(
+  RCLCPP_WARN(
     this->get_logger(),
     "Slave %hhu: Sent PDO index %hu, subindex %hhu, data %x",
     this->driver->get_id(),
@@ -75,7 +75,19 @@ void ProxyDriver::on_rpdo(COData d)
   message.subindex = d.subindex_;
   message.data = d.data_;
   message.type = static_cast<uint8_t>(d.type_);
-  rpdo_publisher->publish(message);
+  if (rpdo_publisher)
+    rpdo_publisher->publish(message);
+}
+
+void ProxyDriver::on_emcy(COEmcy d)
+{
+  auto message = canopen_interfaces::msg::COEmcy();
+  message.eec = d.eec_;
+  message.er = d.er_;
+
+  if (emcy_publisher) {
+    emcy_publisher->publish(message);
+  }
 }
 
 void ProxyDriver::on_nmt_state_reset(

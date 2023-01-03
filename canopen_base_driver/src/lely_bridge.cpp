@@ -52,6 +52,24 @@ void LelyBridge::OnRpdoWrite(uint16_t idx, uint8_t subidx) noexcept
   }
 }
 
+void LelyBridge::OnEmcy(uint16_t eec, uint8_t er, uint8_t msef[5]) noexcept
+{
+  COEmcy emcydata = {eec, er};
+
+  for (int i = 0; i < 5; i++) {
+    emcydata.msef_[i] = msef[i];
+  }
+
+  // We do not care so much about missing a message, rather push them through.
+  std::unique_lock<std::mutex> lk(emcy_mtex, std::defer_lock);
+  if (lk.try_lock()) {
+    if (!emcy_is_set.load()) {
+      emcy_is_set.store(true);
+      emcy_promise.set_value(emcydata);
+    }
+  }
+}
+
 std::future<bool> LelyBridge::async_sdo_write(COData data)
 {
   std::unique_lock<std::mutex> lck(sdo_mutex);
@@ -214,6 +232,14 @@ std::future<COData> LelyBridge::async_request_rpdo()
   rpdo_is_set.store(false);
   rpdo_promise = std::promise<COData>();
   return rpdo_promise.get_future();
+}
+
+std::future<COEmcy> LelyBridge::async_request_emcy()
+{
+  std::scoped_lock<std::mutex> lk(emcy_mtex);
+  emcy_is_set.store(false);
+  emcy_promise = std::promise<COEmcy>();
+  return emcy_promise.get_future();
 }
 
 void LelyBridge::tpdo_transmit(COData data)

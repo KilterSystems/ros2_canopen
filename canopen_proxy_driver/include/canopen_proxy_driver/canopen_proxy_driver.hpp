@@ -25,6 +25,7 @@ class ProxyDriver : public BaseDriver
 {
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr nmt_state_publisher;
   rclcpp::Publisher<canopen_interfaces::msg::COData>::SharedPtr rpdo_publisher;
+  rclcpp::Publisher<canopen_interfaces::msg::COEmcy>::SharedPtr emcy_publisher;
   rclcpp::Subscription<canopen_interfaces::msg::COData>::SharedPtr tpdo_subscriber;
   rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr nmt_state_reset_service;
   rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr nmt_state_start_service;
@@ -39,6 +40,8 @@ protected:
   void on_tpdo(const canopen_interfaces::msg::COData::SharedPtr msg);
 
   void on_rpdo(COData d);
+
+  void on_emcy(COEmcy d);
 
   void on_nmt_state_reset(
     const std_srvs::srv::Trigger::Request::SharedPtr request,
@@ -77,6 +80,9 @@ public:
 
     rpdo_publisher = this->create_publisher<canopen_interfaces::msg::COData>(
       std::string(this->get_name()).append("/rpdo").c_str(), 10);
+
+    emcy_publisher = this->create_publisher<canopen_interfaces::msg::COEmcy>(
+      std::string(this->get_name()).append("/emcy").c_str(), 10);
 
     nmt_state_reset_service = this->create_service<std_srvs::srv::Trigger>(
       std::string(this->get_name()).append("/nmt_reset_node").c_str(),
