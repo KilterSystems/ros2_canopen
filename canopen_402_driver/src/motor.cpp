@@ -482,13 +482,9 @@ namespace canopen_402
         }
         if (sw & (1 << State402::SW_Internal_limit))
         {
-            if (old_sw & (1 << State402::SW_Internal_limit))
+            if (!(old_sw & (1 << State402::SW_Internal_limit)))
             {
-                RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "Internal limit active");
-            }
-            else
-            {
-                RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "Internal limit active");
+                RCLCPP_WARN(rclcpp::get_logger("canopen_402_driver"), "Internal limit activated");
             }
         }
 
