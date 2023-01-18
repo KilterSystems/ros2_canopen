@@ -110,7 +110,7 @@ void ProxyDriver::on_sdo_read(
   const canopen_interfaces::srv::CORead::Request::SharedPtr request,
   canopen_interfaces::srv::CORead::Response::SharedPtr response)
 {
-  RCLCPP_INFO(
+  RCLCPP_DEBUG(
     this->get_logger(), "Slave %hhu: SDO Read Call index=0x%x subindex=%hhu bits=%hhu",
     this->driver->get_id(), request->index, request->subindex, request->type);
 
@@ -136,7 +136,7 @@ void ProxyDriver::on_sdo_write(
   const canopen_interfaces::srv::COWrite::Request::SharedPtr request,
   canopen_interfaces::srv::COWrite::Response::SharedPtr response)
 {
-  RCLCPP_INFO(
+  RCLCPP_DEBUG(
     this->get_logger(), "Slave %hhu: SDO Read Call index=0x%x subindex=%hhu bits=%hhu data=%u",
     this->driver->get_id(), request->index, request->subindex, request->type, request->data);
 
