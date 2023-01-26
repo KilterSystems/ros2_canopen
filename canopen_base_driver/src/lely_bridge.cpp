@@ -54,7 +54,7 @@ void LelyBridge::OnRpdoWrite(uint16_t idx, uint8_t subidx) noexcept
 
 void LelyBridge::OnEmcy(uint16_t eec, uint8_t er, uint8_t msef[5]) noexcept
 {
-  COEmcy emcydata = {eec, er};
+  COEmcy emcydata = {eec, er, {0,0,0,0,0}};
 
   for (int i = 0; i < 5; i++) {
     emcydata.msef_[i] = msef[i];
